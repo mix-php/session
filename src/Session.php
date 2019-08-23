@@ -39,10 +39,16 @@ class Session
     public $name = 'session_id';
 
     /**
-     * SessionID 长度
+     * session_id
+     * @var string
+     */
+    public $id = '';
+
+    /**
+     * session_id长度
      * @var int
      */
-    public $sessionIdLength = 26;
+    public $idLength = 26;
 
     /**
      * 生存时间
@@ -81,12 +87,6 @@ class Session
     public $cookieHttpOnly = false;
 
     /**
-     * SessionID
-     * @var string
-     */
-    protected $sessionId = '';
-
-    /**
      * Authorization constructor.
      * @param array $config
      */
@@ -105,7 +105,7 @@ class Session
         if (is_null($sessionId)) {
             $sessionId = $this->createId();
         }
-        $this->sessionId = $sessionId;
+        $this->id = $sessionId;
         $this->handler->withSessionId($sessionId);
     }
 
@@ -116,7 +116,7 @@ class Session
     public function createId()
     {
         do {
-            $sessionId = RandomStringHelper::randomAlphanumeric($this->sessionIdLength);
+            $sessionId = RandomStringHelper::randomAlphanumeric($this->idLength);
         } while ($this->handler->exists($sessionId));
         return $sessionId;
     }
@@ -133,7 +133,7 @@ class Session
         $this->handler->set($name, $value, $this->maxLifetime);
         // 更新cookie
         $factory = new CookieFactory();
-        $cookie  = $factory->createCookie($this->name, $sessionId, $this->maxLifetime);
+        $cookie  = $factory->createCookie($this->name, $this->id, $this->maxLifetime);
         $cookie->withDomain($this->cookieDomain)
             ->withPath($this->cookiePath)
             ->withSecure($this->cookieSecure)
@@ -196,7 +196,7 @@ class Session
      */
     public function getId()
     {
-        return $this->sessionId;
+        return $this->id;
     }
 
 }
