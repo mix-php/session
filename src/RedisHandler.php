@@ -11,7 +11,7 @@ use Mix\Redis\RedisConnectionInterface;
  * @package Mix\Session
  * @author liu,jian <coder.keda@gmail.com>
  */
-class RedisHandler
+class RedisHandler implements SessionHandlerInterface
 {
 
     /**
@@ -31,6 +31,12 @@ class RedisHandler
      * @var string
      */
     public $keyPrefix = 'SESSION:';
+
+    /**
+     * session_id
+     * @var string
+     */
+    public $sessionId = '';
 
     /**
      * 是否抛出异常
@@ -77,11 +83,31 @@ class RedisHandler
     }
 
     /**
-     * 获取保存的key
-     * @param $sessionId
+     * 设置session_id
+     * @param string $sessionId
+     * @return static
+     */
+    public function withSessionId(string $sessionId)
+    {
+        $this->sessionId = $sessionId;
+        return $this;
+    }
+
+    /**
+     * 获取session_id
      * @return string
      */
-    protected function getKey($sessionId)
+    public function getSessionId()
+    {
+        return $this->sessionId;
+    }
+
+    /**
+     * 获取保存的key
+     * @param string $sessionId
+     * @return string
+     */
+    public function getSaveKey(string $sessionId)
     {
         return $this->keyPrefix . $sessionId;
     }
@@ -95,7 +121,7 @@ class RedisHandler
     {
         try {
 
-            $key     = $this->getKey($sessionId);
+            $key     = $this->getSaveKey($sessionId);
             $success = $this->connection->exists($key);
             return $success ? true : false;
 
@@ -107,16 +133,17 @@ class RedisHandler
 
     /**
      * 赋值
-     * @param $name
+     * @param string $name
      * @param $value
+     * @param int $maxLifetime
      * @return bool
      */
-    public function set(string $sessionId, string $name, $value, int $maxLifetime)
+    public function set(string $name, $value, int $maxLifetime)
     {
         try {
 
-            $key     = $this->getKey($sessionId);
-            $success = $this->connection->hmset($key, [$name => serialize($value)]);
+            $key     = $this->getSaveKey($this->getSessionId());
+            $success = $this->connection->hMset($key, [$name => serialize($value)]);
             $this->connection->expire($key, $maxLifetime);
             return $success ? true : false;
 
@@ -128,15 +155,15 @@ class RedisHandler
 
     /**
      * 取值
-     * @param null $name
-     * @return mixed
+     * @param string $name
+     * @return mixed|null
      */
-    public function get(string $sessionId, string $name)
+    public function get(string $name)
     {
         try {
 
-            $key   = $this->getKey($sessionId);
-            $value = $this->connection->hget($key, $name);
+            $key   = $this->getSaveKey($this->getSessionId());
+            $value = $this->connection->hGet($key, $name);
             return $value === false ? null : unserialize($value);
 
         } catch (\Throwable $e) {
@@ -149,12 +176,12 @@ class RedisHandler
      * 取所有值
      * @return array
      */
-    public function getAttributes(string $sessionId)
+    public function getAttributes()
     {
         try {
 
-            $key    = $this->getKey($sessionId);
-            $result = $this->connection->hgetall($key);
+            $key    = $this->getSaveKey($this->getSessionId());
+            $result = $this->connection->hGetAll($key);
             foreach ($result as $name => $item) {
                 $result[$name] = unserialize($item);
             }
@@ -168,15 +195,15 @@ class RedisHandler
 
     /**
      * 删除
-     * @param $name
+     * @param string $name
      * @return bool
      */
-    public function delete(string $sessionId, string $name)
+    public function delete(string $name)
     {
         try {
 
-            $key     = $this->getKey($sessionId);
-            $success = $this->connection->hdel($key, $name);
+            $key     = $this->getSaveKey($this->getSessionId());
+            $success = $this->connection->hDel($key, $name);
             return $success ? true : false;
 
         } catch (\Throwable $e) {
@@ -189,11 +216,11 @@ class RedisHandler
      * 清除session
      * @return bool
      */
-    public function clear(string $sessionId)
+    public function clear()
     {
         try {
 
-            $key     = $this->getKey($sessionId);
+            $key     = $this->getSaveKey($this->getSessionId());
             $success = $this->connection->del($key);
             return $success ? true : false;
 
@@ -205,15 +232,15 @@ class RedisHandler
 
     /**
      * 判断是否存在
-     * @param $name
+     * @param string $name
      * @return bool
      */
-    public function has(string $sessionId, string $name)
+    public function has(string $name)
     {
         try {
 
-            $key   = $this->getKey($sessionId);
-            $exist = $this->connection->hexists($key, $name);
+            $key   = $this->getSaveKey($this->getSessionId());
+            $exist = $this->connection->hExists($key, $name);
             return $exist ? true : false;
 
         } catch (\Throwable $e) {

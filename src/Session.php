@@ -18,7 +18,7 @@ class Session
 
     /**
      * 处理者
-     * @var RedisHandler
+     * @var SessionHandlerInterface
      */
     public $handler;
 
@@ -106,6 +106,7 @@ class Session
             $sessionId = $this->createId();
         }
         $this->sessionId = $sessionId;
+        $this->handler->withSessionId($sessionId);
     }
 
     /**
@@ -117,7 +118,6 @@ class Session
         do {
             $sessionId = RandomStringHelper::randomAlphanumeric($this->sessionIdLength);
         } while ($this->handler->exists($sessionId));
-        $this->sessionId = $sessionId;
         return $sessionId;
     }
 
@@ -129,9 +129,8 @@ class Session
      */
     public function set(string $name, $value)
     {
-        $sessionId = $this->getId();
         // 赋值
-        $this->handler->set($sessionId, $name, $value, $this->maxLifetime);
+        $this->handler->set($name, $value, $this->maxLifetime);
         // 更新cookie
         $factory = new CookieFactory();
         $cookie  = $factory->createCookie($this->name, $sessionId, $this->maxLifetime);
@@ -150,7 +149,7 @@ class Session
      */
     public function get(string $name)
     {
-        return $this->handler->get($this->getId(), $name);
+        return $this->handler->get($name);
     }
 
     /**
@@ -159,7 +158,7 @@ class Session
      */
     public function getAttributes()
     {
-        return $this->handler->getAttributes($this->getId());
+        return $this->handler->getAttributes();
     }
 
     /**
@@ -169,7 +168,7 @@ class Session
      */
     public function delete(string $name)
     {
-        return $this->handler->delete($this->getId(), $name);
+        return $this->handler->delete($name);
     }
 
     /**
@@ -178,7 +177,7 @@ class Session
      */
     public function clear()
     {
-        return $this->handler->clear($this->getId());
+        return $this->handler->clear();
     }
 
     /**
@@ -188,7 +187,7 @@ class Session
      */
     public function has(string $name)
     {
-        return $this->handler->has($this->getId(), $name);
+        return $this->handler->has($name);
     }
 
     /**

@@ -11,56 +11,60 @@ interface SessionHandlerInterface
 {
 
     /**
-     * 加载 SessionId
-     * @param $name
-     * @param $maxLifetime
-     * @return bool
+     * 设置session_id
+     * @param string $sessionId
+     * @return static
      */
-    public function loadSessionId($name, $maxLifetime);
+    public function withSessionId(string $sessionId);
 
     /**
-     * 创建 SessionId
-     * @param $sessionIdLength
-     * @param $maxLifetime
-     * @return bool
-     */
-    public function createSessionId($sessionIdLength, $maxLifetime);
-
-    /**
-     * 获取 SessionId
+     * 获取session_id
      * @return string
      */
     public function getSessionId();
 
     /**
-     * 赋值
-     * @param $key
-     * @param $value
-     * @param $name
-     * @param $maxLifetime
-     * @param $cookieExpires
-     * @param $cookiePath
-     * @param $cookieDomain
-     * @param $cookieSecure
-     * @param $cookieHttpOnly
+     * 获取保存的key
+     * @param string $sessionId
+     * @return string
+     */
+    public function getSaveKey(string $sessionId);
+
+    /**
+     * 是否存在session_id
+     * @param string $sessionId
      * @return bool
      */
-    public function set($key, $value, $name, $maxLifetime, $cookieExpires, $cookiePath, $cookieDomain, $cookieSecure, $cookieHttpOnly);
+    public function exists(string $sessionId);
+
+    /**
+     * 赋值
+     * @param string $name
+     * @param $value
+     * @param int $maxLifetime
+     * @return bool
+     */
+    public function set(string $name, $value, int $maxLifetime);
 
     /**
      * 取值
-     * @param null $key
-     * @return mixed
+     * @param string $name
+     * @return mixed|null
      */
-    public function get($key = null);
+    public function get(string $name);
 
+    /**
+     * 取所有值
+     * @return array
+     */
+    public function getAttributes();
 
     /**
      * 删除
-     * @param $key
+     * @param string $name
      * @return bool
      */
-    public function delete($key);
+    public function delete(string $name);
 
     /**
      * 清除session
@@ -70,9 +74,9 @@ interface SessionHandlerInterface
 
     /**
      * 判断是否存在
-     * @param $key
+     * @param string $name
      * @return bool
      */
-    public function has($key);
+    public function has(string $name);
 
 }
