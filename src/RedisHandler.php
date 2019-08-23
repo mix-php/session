@@ -36,7 +36,7 @@ class RedisHandler implements SessionHandlerInterface
      * session_id
      * @var string
      */
-    public $sessionId = '';
+    protected $sessionId = '';
 
     /**
      * Authorization constructor.

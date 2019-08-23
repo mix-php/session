@@ -17,12 +17,6 @@ class Session
 {
 
     /**
-     * 处理者
-     * @var SessionHandlerInterface
-     */
-    public $handler;
-
-    /**
      * @var ServerRequest
      */
     public $request;
@@ -31,6 +25,12 @@ class Session
      * @var Response
      */
     public $response;
+
+    /**
+     * 处理者
+     * @var SessionHandlerInterface
+     */
+    public $handler;
 
     /**
      * session名
@@ -42,7 +42,7 @@ class Session
      * session_id
      * @var string
      */
-    public $id = '';
+    protected $id = '';
 
     /**
      * session_id长度
@@ -96,10 +96,9 @@ class Session
     }
 
     /**
-     * 初始化
-     * 加载或创建session_id
+     * 启动新会话或者重用现有会话
      */
-    public function init()
+    public function start()
     {
         $sessionId = $this->request->getAttribute($this->name);
         if (is_null($sessionId)) {
