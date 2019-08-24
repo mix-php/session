@@ -49,9 +49,10 @@ interface SessionHandlerInterface
     /**
      * 取值
      * @param string $name
-     * @return mixed|null
+     * @param null $default
+     * @return mixed
      */
-    public function get(string $name);
+    public function get(string $name, $default = null);
 
     /**
      * 取所有值

@@ -143,12 +143,13 @@ class Session
 
     /**
      * 取值
-     * @param  string $name
+     * @param string $name
+     * @param null $default
      * @return mixed
      */
-    public function get(string $name)
+    public function get(string $name, $default = null)
     {
-        return $this->handler->get($name);
+        return $this->handler->get($name, $default);
     }
 
     /**

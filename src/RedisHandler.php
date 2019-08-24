@@ -133,15 +133,16 @@ class RedisHandler implements SessionHandlerInterface
     /**
      * 取值
      * @param string $name
-     * @return mixed|null
+     * @param null $default
+     * @return mixed
      */
-    public function get(string $name)
+    public function get(string $name, $default = null)
     {
         $key   = $this->getSaveKey($this->getSessionId());
         $conn  = $this->getConnection();
         $value = $conn->hGet($key, $name);
         $this->release($conn);
-        return $value === false ? null : unserialize($value);
+        return $value === false ? $default : unserialize($value);
     }
 
     /**
