@@ -17,11 +17,11 @@
   ],
   "require": {
     "php": ">=7.0.0",
-    "mix/bean": "v2.1.x-dev",
-    "mix/http-message": "v2.1.x-dev",
-    "mix/helper": "v2.1.x-dev",
-    "mix/pool": "v2.1.x-dev",
-    "mix/redis": "v2.1.x-dev"
+    "mix/bean": "v2.1.0-beta",
+    "mix/http-message": "v2.1.0-beta",
+    "mix/helper": "v2.1.0-beta",
+    "mix/pool": "v2.1.0-beta",
+    "mix/redis": "v2.1.0-beta"
   },
   "autoload": {
     "psr-4": {
