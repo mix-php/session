@@ -53,7 +53,7 @@ class RedisHandler implements SessionHandlerInterface
      */
     protected function getConnection()
     {
-        return $this->pool ? $this->pool->getConnection() : $conn;
+        return $this->pool ? $this->pool->getConnection() : $this->connection;
     }
 
     /**
@@ -63,10 +63,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     protected function release($connection)
     {
-        if (!method_exists($conn, 'release')) {
+        if (!method_exists($connection, 'release')) {
             return false;
         }
-        return call_user_func([$conn, 'release']);
+        return call_user_func([$connection, 'release']);
     }
 
     /**
@@ -106,10 +106,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function exists(string $sessionId)
     {
-        $key     = $this->getSaveKey($sessionId);
-        $conn    = $this->getConnection();
-        $success = $conn->exists($key);
-        $this->release($conn);
+        $key        = $this->getSaveKey($sessionId);
+        $connection = $this->getConnection();
+        $success    = $connection->exists($key);
+        $this->release($connection);
         return $success ? true : false;
     }
 
@@ -122,11 +122,11 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function set(string $name, $value, int $maxLifetime)
     {
-        $key     = $this->getSaveKey($this->getSessionId());
-        $conn    = $this->getConnection();
-        $success = $conn->hMset($key, [$name => serialize($value)]);
-        $conn->expire($key, $maxLifetime);
-        $this->release($conn);
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $success    = $connection->hMset($key, [$name => serialize($value)]);
+        $connection->expire($key, $maxLifetime);
+        $this->release($connection);
         return $success ? true : false;
     }
 
@@ -138,10 +138,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function get(string $name, $default = null)
     {
-        $key   = $this->getSaveKey($this->getSessionId());
-        $conn  = $this->getConnection();
-        $value = $conn->hGet($key, $name);
-        $this->release($conn);
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $value      = $connection->hGet($key, $name);
+        $this->release($connection);
         return $value === false ? $default : unserialize($value);
     }
 
@@ -151,10 +151,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function getAttributes()
     {
-        $key    = $this->getSaveKey($this->getSessionId());
-        $conn   = $this->getConnection();
-        $result = $conn->hGetAll($key);
-        $this->release($conn);
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $result     = $connection->hGetAll($key);
+        $this->release($connection);
         foreach ($result as $name => $item) {
             $result[$name] = unserialize($item);
         }
@@ -168,10 +168,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function delete(string $name)
     {
-        $key     = $this->getSaveKey($this->getSessionId());
-        $conn    = $this->getConnection();
-        $success = $conn->hDel($key, $name);
-        $this->release($conn);
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $success    = $connection->hDel($key, $name);
+        $this->release($connection);
         return $success ? true : false;
     }
 
@@ -181,10 +181,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function clear()
     {
-        $key     = $this->getSaveKey($this->getSessionId());
-        $conn    = $this->getConnection();
-        $success = $conn->del($key);
-        $this->release($conn);
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $success    = $connection->del($key);
+        $this->release($connection);
         return $success ? true : false;
     }
 
@@ -195,10 +195,10 @@ class RedisHandler implements SessionHandlerInterface
      */
     public function has(string $name)
     {
-        $key   = $this->getSaveKey($this->getSessionId());
-        $conn  = $this->getConnection();
-        $exist = $conn->hExists($key, $name);
-        $this->release($conn);
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $exist      = $connection->hExists($key, $name);
+        $this->release($connection);
         return $exist ? true : false;
     }
 
