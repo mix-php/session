@@ -93,7 +93,6 @@ class Session
     public function __construct(array $config = [])
     {
         BeanInjector::inject($this, $config);
-        $this->start();
     }
 
     /**
