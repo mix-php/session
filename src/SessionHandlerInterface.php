@@ -31,20 +31,26 @@ interface SessionHandlerInterface
     public function getSaveKey(string $sessionId);
 
     /**
-     * 是否存在session_id
+     * 判断 session_id 是否存在
      * @param string $sessionId
      * @return bool
      */
     public function exists(string $sessionId);
 
     /**
-     * 赋值
-     * @param string $name
-     * @param $value
+     * 更新生存时间
      * @param int $maxLifetime
      * @return bool
      */
-    public function set(string $name, $value, int $maxLifetime);
+    public function expire(int $maxLifetime);
+
+    /**
+     * 赋值
+     * @param string $name
+     * @param $value
+     * @return bool
+     */
+    public function set(string $name, $value);
 
     /**
      * 取值

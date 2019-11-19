@@ -100,7 +100,7 @@ class RedisHandler implements SessionHandlerInterface
     }
 
     /**
-     * 是否存在session_id
+     * 判断 session_id 是否存在
      * @param string $sessionId
      * @return bool
      */
@@ -114,18 +114,30 @@ class RedisHandler implements SessionHandlerInterface
     }
 
     /**
-     * 赋值
-     * @param string $name
-     * @param $value
+     * 更新生存时间
      * @param int $maxLifetime
      * @return bool
      */
-    public function set(string $name, $value, int $maxLifetime)
+    public function expire(int $maxLifetime)
+    {
+        $key        = $this->getSaveKey($this->getSessionId());
+        $connection = $this->getConnection();
+        $success    = $connection->expire($key, $maxLifetime);
+        $this->release($connection);
+        return $success ? true : false;
+    }
+
+    /**
+     * 赋值
+     * @param string $name
+     * @param $value
+     * @return bool
+     */
+    public function set(string $name, $value)
     {
         $key        = $this->getSaveKey($this->getSessionId());
         $connection = $this->getConnection();
         $success    = $connection->hMset($key, [$name => serialize($value)]);
-        $connection->expire($key, $maxLifetime);
         $this->release($connection);
         return $success ? true : false;
     }

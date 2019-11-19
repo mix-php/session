@@ -129,10 +129,12 @@ class Session
     public function set(string $name, $value)
     {
         // 赋值
-        $this->handler->set($name, $value, $this->maxLifetime);
-        // 更新cookie
+        $this->handler->set($name, $value);
+        // 更新生存时间
+        $this->handler->expire($this->maxLifetime);
+        // 设置/更新cookie
         $factory = new CookieFactory();
-        $cookie  = $factory->createCookie($this->name, $this->id, $this->maxLifetime);
+        $cookie  = $factory->createCookie($this->name, $this->id, time() + $this->maxLifetime);
         $cookie->withDomain($this->cookieDomain)
             ->withPath($this->cookiePath)
             ->withSecure($this->cookieSecure)
@@ -149,6 +151,17 @@ class Session
      */
     public function get(string $name, $default = null)
     {
+        // 更新生存时间
+        $this->handler->expire($this->maxLifetime);
+        // 设置/更新cookie
+        $factory = new CookieFactory();
+        $cookie  = $factory->createCookie($this->name, $this->id, time() + $this->maxLifetime);
+        $cookie->withDomain($this->cookieDomain)
+            ->withPath($this->cookiePath)
+            ->withSecure($this->cookieSecure)
+            ->withHttpOnly($this->cookieHttpOnly);
+        $this->response->withCookie($cookie);
+        // 返回值
         return $this->handler->get($name, $default);
     }
 
